@@ -162,6 +162,18 @@ app.post("/api/submit", async (req, res) => {
     if (Array.isArray(cartItems) && cartItems.length > 0) {
       cartItems.forEach((item) => {
         noteLines.push(`- ${item.shapeLabel}${item.sizeLabel ? ` | Size: ${item.sizeLabel}` : ""} | $${item.price}`);
+
+        if (Array.isArray(item.addons) && item.addons.length > 0) {
+          item.addons.forEach((addon) => {
+            const qty = (addon.qty || 1) > 1 ? ` x${addon.qty}` : "";
+            const addonTotal = ((addon.price || 0) * (addon.qty || 1)).toFixed(2);
+            noteLines.push(`  + ${addon.label}${qty} | $${addonTotal}`);
+          });
+        }
+
+        if (item.inscriptionText && item.inscriptionText.trim()) {
+          noteLines.push(`  Inscription: "${item.inscriptionText.trim()}"`);
+        }
       });
     }
     noteLines.push(photoUrl ? `\nCustomer Photo: ${photoUrl}` : "\nNo photo uploaded.");
